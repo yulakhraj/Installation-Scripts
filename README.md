@@ -111,16 +111,16 @@ The script will show headers and success messages during installation.
 
 ## Troubleshooting
 
-1.If you encounter any issues while using these tools, consider the following steps:
-2. Check Logs: Review the logs of the relevant tool for error messages that might indicate the cause of the problem.
-3. Verify Configuration: Ensure that configuration files are set up correctly and contain the necessary parameters.
-4. Restart Services: Sometimes restarting affected services can resolve temporary issues.
-5. Consult Documentation: Refer to the official documentation for each tool, as it often provides detailed troubleshooting steps specific to the tool.
+* 1.If you encounter any issues while using these tools, consider the following steps:
+* 2. Check Logs: Review the logs of the relevant tool for error messages that might indicate the cause of the problem.
+* 3. Verify Configuration: Ensure that configuration files are set up correctly and contain the necessary parameters.
+* 4. Restart Services: Sometimes restarting affected services can resolve temporary issues.
+* 5. Consult Documentation: Refer to the official documentation for each tool, as it often provides detailed troubleshooting steps specific to the tool.
 
 ## Contribution
 
 We welcome contributions to this project! You can contribute by:
-    -Submitting issues to report bugs or suggest improvements.
-    -Creating feature requests for functionalities you'd like to see added.
-    -Submitting pull requests with your contributions to the codebase.
+- Submitting issues to report bugs or suggest improvements.
+- Creating feature requests for functionalities you'd like to see added.
+- Submitting pull requests with your contributions to the codebase.
 
