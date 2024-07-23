@@ -27,7 +27,7 @@ This script is a comprehensive installer that integrates the installation of var
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/your-repository.git
+   git clone https://github.com/yulakhraj/Installation-Scripts.git
    cd your-repository
    ```
 2. **Make Scripts Executable**:
