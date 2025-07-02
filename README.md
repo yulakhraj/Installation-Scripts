@@ -123,4 +123,5 @@ We welcome contributions to this project! You can contribute by:
 - Submitting issues to report bugs or suggest improvements.
 - Creating feature requests for functionalities you'd like to see added.
 - Submitting pull requests with your contributions to the codebase.
+- All Okay
 
