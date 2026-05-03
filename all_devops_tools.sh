@@ -1,270 +1,220 @@
 #!/bin/bash
 
-# Function to print a header
+set -e
+
+# -----------------------------
+# UI HELPERS
+# -----------------------------
 print_header() {
-    local msg="$1"
-    local color="\033[1;34m" # Blue color
-    local reset="\033[0m"    # Reset color
-
-    echo -e "${color}#######################################################################${reset}"
-    echo -e "${color}           ${msg}                   ${reset}"
-    echo -e "${color}#######################################################################${reset}"
+    echo -e "\033[1;34m====================================================\033[0m"
+    echo -e "\033[1;34m $1 \033[0m"
+    echo -e "\033[1;34m====================================================\033[0m"
 }
 
-# Function to print a success message
 print_success() {
-    local msg="$1"
-    local color="\033[1;32m" # Green color
-    local reset="\033[0m"    # Reset color
-
-    echo -e "${color}#######################################################################${reset}"
-    echo -e "${color}           ${msg}                   ${reset}"
-    echo -e "${color}#######################################################################${reset}"
+    echo -e "\033[1;32m✔ $1\033[0m"
 }
 
-# Function to install Docker
+# -----------------------------
+# BASE SETUP
+# -----------------------------
+update_system() {
+    print_header "Updating System"
+    sudo apt-get update -y
+}
+
+install_basic_tools() {
+    print_header "Installing Basic Dependencies"
+    sudo apt-get install -y curl wget unzip gnupg lsb-release ca-certificates software-properties-common
+}
+
+# -----------------------------
+# DOCKER (LATEST OFFICIAL)
+# -----------------------------
 install_docker() {
     print_header "Installing Docker"
+
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+        sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+      https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
     sudo apt-get update -y
-    sudo apt-get install -y docker.io
-    sudo systemctl start docker
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
     sudo systemctl enable docker
-    print_success "Docker installed successfully."
+    sudo systemctl start docker
+
+    print_success "Docker Installed"
 }
 
-# Function to install Docker Compose
-install_docker_compose() {
-    print_header "Installing Docker Compose"
-    sudo apt-get update -y
-    sudo apt-get install -y docker-compose
-    print_success "Docker Compose installed successfully."
-}
-
-# Function to install Maven
-install_maven() {
-    print_header "Installing Maven"
-    sudo apt-get update -y
-    sudo apt-get install -y maven
-    print_success "Maven installed successfully."
-}
-
-# Function to install Gradle
-install_gradle() {
-    print_header "Installing Gradle"
-    sudo apt-get update -y
-    sudo apt-get install -y gradle
-    print_success "Gradle installed successfully."
-}
-
-# Function to install Jenkins
-install_jenkins() {
-    print_header "Installing Jenkins"
-    
-	sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
-  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-	sudo apt-get update -y
-	sudo apt-get install jenkins -y
-    print_success "Jenkins installed and started."
-}
-
-# Function to install Ansible
-install_ansible() {
-    print_header "Installing Ansible"
-    sudo apt-get update -y
-    sudo apt-get install -y ansible
-    print_success "Ansible installed successfully."
-}
-
-# Function to install Chef
-install_chef() {
-    print_header "Installing Chef"
-    curl -L https://www.chef.io/chef/install.sh | sudo bash
-    print_success "Chef installed successfully."
-}
-
-# Function to install Puppet
-install_puppet() {
-    print_header "Installing Puppet"
-    sudo apt-get update -y
-    sudo apt-get install -y puppet
-    print_success "Puppet installed successfully."
-}
-
-# Function to install Terraform
+# -----------------------------
+# TERRAFORM (LATEST)
+# -----------------------------
 install_terraform() {
     print_header "Installing Terraform"
-    wget https://releases.hashicorp.com/terraform/1.3.0/terraform_1.3.0_linux_amd64.zip
-    unzip terraform_1.3.0_linux_amd64.zip
-    sudo mv terraform /usr/local/bin/
-    print_success "Terraform installed successfully."
+
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+      sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg
+
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp.gpg] \
+      https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+      sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+    sudo apt-get update -y
+    sudo apt-get install -y terraform
+
+    print_success "Terraform Installed"
 }
 
-# Function to install Prometheus
-install_prometheus() {
-    print_header "Installing Prometheus"
-    wget https://github.com/prometheus/prometheus/releases/download/v2.43.0/prometheus-2.43.0.linux-amd64.tar.gz
-    tar xvfz prometheus-2.43.0.linux-amd64.tar.gz
-    cd prometheus-2.43.0.linux-amd64/
-    ./prometheus &
-    cd ..
-    print_success "Prometheus installed and started."
+# -----------------------------
+# JENKINS (JAVA 21)
+# -----------------------------
+install_jenkins() {
+    print_header "Installing Jenkins (Java 21)"
+
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
+      sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+      https://pkg.jenkins.io/debian-stable binary/" | \
+      sudo tee /etc/apt/sources.list.d/jenkins.list
+
+    sudo apt-get update -y
+    sudo apt-get install -y openjdk-21-jdk jenkins
+
+    sudo systemctl enable jenkins
+    sudo systemctl start jenkins
+
+    print_success "Jenkins Installed"
 }
 
-# Function to install Grafana
-install_grafana() {
-    print_header "Installing Grafana"
-    wget https://dl.grafana.com/oss/release/grafana-9.6.2.linux-amd64.tar.gz
-    tar -zxvf grafana-9.6.2.linux-amd64.tar.gz
-    cd grafana-9.6.2
-    ./bin/grafana-server &
-    cd ..
-    print_success "Grafana installed and started."
+# -----------------------------
+# ANSIBLE
+# -----------------------------
+install_ansible() {
+    print_header "Installing Ansible"
+    sudo apt-get install -y ansible
+    print_success "Ansible Installed"
 }
 
-# Function to install ELK Stack
-install_elk() {
-    print_header "Installing ELK Stack"
-    # Install Elasticsearch
-    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.0-linux-x86_64.tar.gz
-    tar -xzf elasticsearch-8.3.0-linux-x86_64.tar.gz
-    cd elasticsearch-8.3.0
-    ./bin/elasticsearch &
-    
-    # Install Logstash
-    wget https://artifacts.elastic.co/downloads/logstash/logstash-8.3.0-linux-x86_64.tar.gz
-    tar -xzf logstash-8.3.0-linux-x86_64.tar.gz
-    cd logstash-8.3.0
-    ./bin/logstash &
-    
-    # Install Kibana
-    wget https://artifacts.elastic.co/downloads/kibana/kibana-8.3.0-linux-x86_64.tar.gz
-    tar -xzf kibana-8.3.0-linux-x86_64.tar.gz
-    cd kibana-8.3.0
-    ./bin/kibana &
-    cd ..
-    print_success "ELK Stack installed and started."
-}
-
-# Function to install AWS CLI
+# -----------------------------
+# AWS CLI
+# -----------------------------
 install_aws_cli() {
     print_header "Installing AWS CLI"
-	curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-    print_success "AWS CLI installed successfully."
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+    unzip -o awscliv2.zip
+    sudo ./aws/install --update
+    print_success "AWS CLI Installed"
 }
 
-# Function to install Azure CLI
+# -----------------------------
+# AZURE CLI
+# -----------------------------
 install_azure_cli() {
     print_header "Installing Azure CLI"
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    print_success "Azure CLI installed successfully."
+    print_success "Azure CLI Installed"
 }
 
-# Function to install Google Cloud SDK
-install_gcloud_sdk() {
-    print_header "Installing Google Cloud SDK"
-    curl https://sdk.cloud.google.com | bash
-    exec -l $SHELL
-    gcloud init
-    print_success "Google Cloud SDK installed successfully."
+# -----------------------------
+# KUBECTL (LATEST)
+# -----------------------------
+install_kubectl() {
+    print_header "Installing kubectl"
+
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+
+    print_success "kubectl Installed"
 }
 
-# Function to install Netcat
-install_netcat() {
-    print_header "Installing Netcat"
-    sudo apt-get update -y
-    sudo apt-get install -y netcat
-    print_success "Netcat installed successfully."
+# -----------------------------
+# KIND (K8s in Docker)
+# -----------------------------
+install_kind() {
+    print_header "Installing kind"
+
+    curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+    chmod +x kind
+    sudo mv kind /usr/local/bin/kind
+
+    print_success "kind Installed"
 }
 
-# Function to install Nmap
-install_nmap() {
-    print_header "Installing Nmap"
-    sudo apt-get update -y
-    sudo apt-get install -y nmap
-    print_success "Nmap installed successfully."
-}
-
-# Function to install Python3
-install_python() {
-    print_header "Installing Python3"
-    sudo apt-get update -y
-    sudo apt-get install -y python3
-    print_success "Python3 installed successfully."
-}
-
-# Function to install MySQL
+# -----------------------------
+# DATABASES
+# -----------------------------
 install_mysql() {
     print_header "Installing MySQL"
-    sudo apt-get update -y
     sudo apt-get install -y mysql-server
-    print_success "MySQL installed successfully."
+    print_success "MySQL Installed"
 }
 
-# Function to install PostgreSQL
-install_postgresql() {
+install_postgres() {
     print_header "Installing PostgreSQL"
-    sudo apt-get update -y
     sudo apt-get install -y postgresql
-    print_success "PostgreSQL installed successfully."
+    print_success "PostgreSQL Installed"
 }
 
-# Display menu
-display_menu() {
-    echo "DevOps Tools Installer"
-    echo "1. Install Docker"
-    echo "2. Install Docker Compose"
-    echo "3. Install Maven"
-    echo "4. Install Gradle"
-    echo "5. Install Jenkins"
-    echo "6. Install Ansible"
-    echo "7. Install Chef"
-    echo "8. Install Puppet"
-    echo "9. Install Terraform"
-    echo "10. Install Prometheus"
-    echo "11. Install Grafana"
-    echo "12. Install ELK Stack"
-    echo "13. Install AWS CLI"
-    echo "14. Install Azure CLI"
-    echo "15. Install Google Cloud SDK"
-    echo "16. Install Netcat"
-    echo "17. Install Nmap"
-    echo "18. Install Python3"
-    echo "19. Install MySQL"
-    echo "20. Install PostgreSQL"
-    echo "0. Exit"
+# -----------------------------
+# MENU
+# -----------------------------
+show_menu() {
+    echo ""
+    echo "========= DevOps Installer ========="
+    echo "1  Docker"
+    echo "2  Terraform"
+    echo "3  Jenkins"
+    echo "4  Ansible"
+    echo "5  AWS CLI"
+    echo "6  Azure CLI"
+    echo "7  kubectl"
+    echo "8  kind"
+    echo "9  MySQL"
+    echo "10 PostgreSQL"
+    echo "0  Exit"
+    echo ""
 }
 
-# Main script
-while true; do
-    display_menu
-    read -p "Choose an option: " option
-    case $option in
+handle_choice() {
+    case $1 in
         1) install_docker ;;
-        2) install_docker_compose ;;
-        3) install_maven ;;
-        4) install_gradle ;;
-        5) install_jenkins ;;
-        6) install_ansible ;;
-        7) install_chef ;;
-        8) install_puppet ;;
-        9) install_terraform ;;
-        10) install_prometheus ;;
-        11) install_grafana ;;
-        12) install_elk ;;
-        13) install_aws_cli ;;
-        14) install_azure_cli ;;
-        15) install_gcloud_sdk ;;
-        16) install_netcat ;;
-        17) install_nmap ;;
-        18) install_python ;;
-        19) install_mysql ;;
-        20) install_postgresql ;;
-        0) print_header "Exiting..."; exit ;;
-        *) echo "Invalid option. Please try again." ;;
+        2) install_terraform ;;
+        3) install_jenkins ;;
+        4) install_ansible ;;
+        5) install_aws_cli ;;
+        6) install_azure_cli ;;
+        7) install_kubectl ;;
+        8) install_kind ;;
+        9) install_mysql ;;
+        10) install_postgres ;;
+        *) echo "Invalid option: $1" ;;
     esac
+}
+
+# -----------------------------
+# MAIN
+# -----------------------------
+update_system
+install_basic_tools
+
+while true; do
+    show_menu
+    echo "Enter choices (space separated, e.g. 1 3 7):"
+    read choices
+
+    for choice in $choices; do
+        if [[ "$choice" == "0" ]]; then
+            print_header "Exiting..."
+            exit 0
+        fi
+        handle_choice $choice
+    done
 done
