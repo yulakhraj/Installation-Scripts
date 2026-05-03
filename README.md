@@ -1,26 +1,25 @@
-# DevOps Tools Installation Scripts
+# DevOps Tools Installation Script
 
-This repository contains Bash scripts for installing various DevOps tools on Linux systems. The scripts offer a menu-based interface for selecting and installing tools, making it easy to set up your development and operations environment.
+This repository contains a Bash script for installing various DevOps tools on Linux systems. The script provides a menu-based interface for selecting and installing tools, making it easy to set up your development and operations environment.
 
 ## Overview
 
-### `install.sh`
-
-This script is designed to provide a menu-driven interface for installing a variety of DevOps tools. It allows you to select tools from a list and install them with default options to avoid prompts.
-
-![Screenshot](https://github.com/user-attachments/assets/56c1c04f-0034-4a7f-812a-1f8255f881e1)
-
 ### `all_devops_tools.sh`
 
-This script is a comprehensive installer that integrates the installation of various tools and provides detailed output, including headers and success messages, for better visibility and tracking of the installation process.
-
-![Screenshot](https://github.com/user-attachments/assets/76031289-0198-455e-ac95-7776a55740c9)
+This script offers a comprehensive installer for DevOps tools with a user-friendly menu. It updates the system, installs basic dependencies, and allows you to select from a list of tools to install. The script provides detailed output with color-coded headers and success messages for better visibility and tracking of the installation process.
 
 ## Features
 
-- **Menu-Based Installation**: Choose tools to install from a simple menu interface.
+- **Menu-Based Installation**: Choose tools to install from a simple numbered menu interface.
 - **Automated Installation**: Install tools with default options to avoid prompts.
 - **Color-Coded Output**: Clear headers and success messages with color formatting.
+- **System Update**: Automatically updates the system and installs basic dependencies before tool installation.
+
+## Prerequisites
+
+- Ubuntu or Debian-based Linux distribution
+- sudo privileges
+- Internet connection for downloading packages
 
 ## Installation
 
@@ -28,76 +27,57 @@ This script is a comprehensive installer that integrates the installation of var
 
    ```bash
    git clone https://github.com/yulakhraj/Installation-Scripts.git
-   cd your-repository
+   cd Installation-Scripts
    ```
-2. **Make Scripts Executable**:
-   ```
-   chmod +x install.sh
+
+2. **Make the Script Executable**:
+
+   ```bash
    chmod +x all_devops_tools.sh
    ```
+
 ## Usage
-Running `install.sh`
 
-This script provides a menu for selecting which tools to install. Run it with:
-```
-./install.sh
-```
-Follow the prompts to choose and install the desired tools.
+Run the script with:
 
-Running `all_devops_tools.sh`
-
-This script installs a comprehensive set of DevOps tools and provides detailed output. Run it with:
-```
+```bash
 ./all_devops_tools.sh
 ```
-The script will show headers and success messages during installation.
+
+The script will:
+1. Update your system packages
+2. Install basic dependencies (curl, wget, unzip, etc.)
+3. Display a menu with available tools
+4. Allow you to select tools by entering their numbers (space-separated for multiple selections)
+5. Install the selected tools with progress indicators
+
+Example: To install Docker and Terraform, enter `1 2` when prompted.
 
 ## Tools Included
 
-### Containerization
+The script can install the following tools:
 
-- **Docker**: Container platform for building and deploying applications in standardized units called containers. [Get Started with Docker](https://docs.docker.com/get-started/)
-- **Docker Compose**: Tool for defining and running multi-container Docker applications with ease. [Docker Compose Documentation](https://docs.docker.com/compose/)
+1. **Docker**: Container platform for building and deploying applications in standardized units called containers.
+2. **Terraform**: Open-source tool for defining and provisioning infrastructure using code.
+3. **Jenkins**: Open-source automation server for building, testing, and deploying software (includes Java 21).
+4. **Ansible**: Powerful tool for automating configuration management and application deployment.
+5. **AWS CLI**: Command-line interface for interacting with Amazon Web Services (AWS) resources.
+6. **Azure CLI**: Command-line interface for managing Azure cloud resources.
+7. **kubectl**: Command-line tool for controlling Kubernetes clusters.
+8. **kind**: Tool for running local Kubernetes clusters using Docker container nodes.
+9. **MySQL**: Open-source relational database management system.
+10. **PostgreSQL**: Advanced open-source relational database.
 
-### Build Automation Tools
+## Notes
 
-- **Maven**: Popular build automation tool for Java projects, streamlining the build process. [Maven Website](https://maven.apache.org/)
-- **Gradle**: Versatile build automation tool for various project types, offering flexibility in the build process. [Gradle Installation Guide](https://docs.gradle.org/current/userguide/installation.html)
+- The script installs the latest stable versions of the tools where possible.
+- Some tools may require additional configuration after installation (e.g., Docker user group, Jenkins initial setup).
+- For production use, review the installed versions and security settings.
+- The script uses `sudo` for system-level installations, so ensure your user has appropriate permissions.
 
-### Continuous Integration/Continuous Delivery (CI/CD) Tools
+## Contributing
 
-- **Jenkins**: Open-source automation server for building, testing, and deploying software, enabling CI/CD pipelines. [Jenkins Website](https://www.jenkins.io/)
-
-### Configuration Management Tools
-
-- **Ansible**: Powerful tool for automating configuration management and application deployment across various platforms. [Ansible Website](https://www.ansible.com/)
-- **Chef**: Robust configuration management tool for infrastructure and applications, ensuring consistency across environments. [Chef Website](https://www.chef.io/)
-- **Puppet**: Open-source IT automation framework for managing configurations of servers and network devices. [Puppet Website](https://puppet.com/)
-
-### Infrastructure as Code (IaC) Tool
-
-- **Terraform**: Open-source tool for defining and provisioning infrastructure using code, ensuring repeatable and maintainable infrastructure. [Terraform Website](https://www.terraform.io/)
-
-### Monitoring and Alerting Tools
-
-- **Prometheus**: Open-source toolkit for monitoring and alerting based on time series data, providing insights into system health. [Prometheus Website](https://prometheus.io/)
-- **Grafana**: Open-source analytics and monitoring platform for visualizing metrics and logs, allowing for data exploration and analysis. [Grafana Website](https://grafana.com/)
-
-### ELK Stack
-
-- **Elasticsearch**: Distributed search and analytics engine for log data. [Elasticsearch Website](https://www.elastic.co/elasticsearch/)
-- **Logstash**: Server-side data processing pipeline for transforming and enriching log data. [Logstash Website](https://www.elastic.co/logstash/)
-- **Kibana**: Data visualization tool for interacting with data stored in Elasticsearch. [Kibana Documentation](https://www.elastic.co/kibana/)
-
-### Cloud Provider Tools
-
-- **AWS CLI**: Command-line interface for interacting with Amazon Web Services (AWS) resources. [AWS CLI Website](https://aws.amazon.com/cli/)
-- **Azure CLI**: Command-line interface for managing Azure cloud resources. [Azure CLI Documentation](https://docs.microsoft.com/en-us/cli/azure/)
-- **Google Cloud SDK**: Command-line tools for managing Google Cloud Platform (GCP) resources. [Google Cloud SDK Website](https://cloud.google.com/sdk)
-
-### Networking Tools
-
-- **Netcat**: Simple network utility for reading and writing data across TCP or UDP connections. [Netcat Documentation](https://nc110.sourceforge.io/)
+Feel free to submit issues or pull requests to add more tools or improve the installation process.
 - **Nmap**: Powerful network scanner for discovering services and vulnerabilities on computer networks. [Nmap Website](https://nmap.org/)
 
 ### Programming Languages
