@@ -15,6 +15,59 @@ print_success() {
     echo -e "\033[1;32m✔ $1\033[0m"
 }
 
+display_read_message() {
+    local name="$1"
+    local action="$2"
+
+    clear
+    echo "**************************************************"
+    echo "******************  Installing  ******************"
+    echo "**************************************************"
+    echo ""
+    echo " $action"
+    echo " Tool: $name"
+    echo ""
+    echo "**************************************************"
+    echo ""
+    sleep 2
+}
+
+is_tool_installed() {
+    local cmd="$1"
+    eval "$cmd" >/dev/null 2>&1
+}
+
+print_install_action() {
+    local name="$1"
+    local check_cmd="$2"
+    if is_tool_installed "$check_cmd"; then
+        display_read_message "$name" "Upgrading $name"
+        print_header "Upgrading $name"
+    else
+        display_read_message "$name" "Fresh install of $name"
+        print_header "Fresh install of $name"
+    fi
+}
+
+get_installed_version() {
+    local cmd="$1"
+    local output
+    output=$(eval "$cmd" 2>/dev/null || true)
+    echo "${output%%$'\n'*}"
+}
+
+print_tool_installed() {
+    local name="$1"
+    local cmd="$2"
+    local version
+    version=$(get_installed_version "$cmd")
+    if [[ -n "$version" ]]; then
+        print_success "${name^^} INSTALLED - $version"
+    else
+        print_success "${name^^} INSTALLED"
+    fi
+}
+
 # -----------------------------
 # BASE SETUP
 # -----------------------------
@@ -32,7 +85,7 @@ install_basic_tools() {
 # DOCKER (LATEST OFFICIAL)
 # -----------------------------
 install_docker() {
-    print_header "Installing Docker"
+    print_install_action "Docker" "docker --version"
 
     sudo install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
@@ -49,14 +102,14 @@ install_docker() {
     sudo systemctl enable docker
     sudo systemctl start docker
 
-    print_success "Docker Installed"
+    print_tool_installed "Docker" "docker --version"
 }
 
 # -----------------------------
 # TERRAFORM (LATEST)
 # -----------------------------
 install_terraform() {
-    print_header "Installing Terraform"
+    print_install_action "Terraform" "terraform version"
 
     curl -fsSL https://apt.releases.hashicorp.com/gpg | \
       sudo gpg --dearmor -o /usr/share/keyrings/hashicorp.gpg
@@ -68,14 +121,14 @@ install_terraform() {
     sudo apt-get update -y
     sudo apt-get install -y terraform
 
-    print_success "Terraform Installed"
+    print_tool_installed "Terraform" "terraform version | head -n1"
 }
 
 # -----------------------------
 # JENKINS (JAVA 21)
 # -----------------------------
 install_jenkins() {
-    print_header "Installing Jenkins (Java 21)"
+    print_install_action "Jenkins" "jenkins --version 2>/dev/null || dpkg-query -W -f='${Version}' jenkins 2>/dev/null"
 
     curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
       sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
@@ -90,77 +143,77 @@ install_jenkins() {
     sudo systemctl enable jenkins
     sudo systemctl start jenkins
 
-    print_success "Jenkins Installed"
+    print_tool_installed "Jenkins" "jenkins --version 2>/dev/null || dpkg-query -W -f='${Version}' jenkins 2>/dev/null"
 }
 
 # -----------------------------
 # ANSIBLE
 # -----------------------------
 install_ansible() {
-    print_header "Installing Ansible"
+    print_install_action "Ansible" "ansible --version"
     sudo apt-get install -y ansible
-    print_success "Ansible Installed"
+    print_tool_installed "Ansible" "ansible --version | head -n1"
 }
 
 # -----------------------------
 # AWS CLI
 # -----------------------------
 install_aws_cli() {
-    print_header "Installing AWS CLI"
+    print_install_action "AWS CLI" "aws --version"
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
     unzip -o awscliv2.zip
     sudo ./aws/install --update
-    print_success "AWS CLI Installed"
+    print_tool_installed "AWS CLI" "aws --version 2>&1 | head -n1"
 }
 
 # -----------------------------
 # AZURE CLI
 # -----------------------------
 install_azure_cli() {
-    print_header "Installing Azure CLI"
+    print_install_action "Azure CLI" "az --version"
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    print_success "Azure CLI Installed"
+    print_tool_installed "Azure CLI" "az --version | head -n1"
 }
 
 # -----------------------------
 # KUBECTL (LATEST)
 # -----------------------------
 install_kubectl() {
-    print_header "Installing kubectl"
+    print_install_action "kubectl" "kubectl version --client --short"
 
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     chmod +x kubectl
     sudo mv kubectl /usr/local/bin/
 
-    print_success "kubectl Installed"
+    print_tool_installed "kubectl" "kubectl version --client --short"
 }
 
 # -----------------------------
 # KIND (K8s in Docker)
 # -----------------------------
 install_kind() {
-    print_header "Installing kind"
+    print_install_action "kind" "kind --version"
 
     curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
     chmod +x kind
     sudo mv kind /usr/local/bin/kind
 
-    print_success "kind Installed"
+    print_tool_installed "kind" "kind --version"
 }
 
 # -----------------------------
 # DATABASES
 # -----------------------------
 install_mysql() {
-    print_header "Installing MySQL"
+    print_install_action "MySQL" "mysql --version"
     sudo apt-get install -y mysql-server
-    print_success "MySQL Installed"
+    print_tool_installed "MySQL" "mysql --version"
 }
 
 install_postgres() {
-    print_header "Installing PostgreSQL"
+    print_install_action "PostgreSQL" "psql --version"
     sudo apt-get install -y postgresql
-    print_success "PostgreSQL Installed"
+    print_tool_installed "PostgreSQL" "psql --version"
 }
 
 # -----------------------------
